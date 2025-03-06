@@ -1,0 +1,34 @@
+<!-- recommendations.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommendations</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Book Recommendations</h2>
+        <form action="/recommend" method="POST">
+            <div class="form-group">
+                <input type="text" name="genre" placeholder="Enter choice" required>
+            </div>
+            <button type="submit">Get Recommendations</button>
+        </form>
+
+        <% if (books && books.length > 0) { %>
+            <h3>Recommended Books</h3>
+            <ul>
+                <% books.forEach(book => { %>
+                    <li><%= book.title %> by <%= book.author %> (<%= book.genre %>)</li>
+                <% }) %>
+            </ul>
+        <% } else { %>
+            <p>No books found. Try a different genre!</p>
+        <% } %>
+        
+        <div><a href="/">Back to Login</a></div>
+    </div>
+</body>
+</html>

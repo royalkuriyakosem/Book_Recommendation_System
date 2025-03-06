@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Books</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Search for Book Recommendations</h2>
+        <form action="/search-recommend" method="POST">
+            <div class="form-group">
+                <input type="text" name="title" placeholder="Book Title">
+            </div>
+            <div class="form-group">
+                <input type="text" name="author" placeholder="Author Name">
+            </div>
+            <div class="form-group">
+                <input type="text" name="genre" placeholder="Genre">
+            </div>
+            <div class="form-group">
+                <input type="number" name="year" placeholder="Year of Publication">
+            </div>
+            <button type="submit">Search</button>
+        </form>
+
+        <% if (recommendations.length > 0) { %>
+            <h3>Recommended Books</h3>
+            <ul>
+                <% recommendations.forEach(book => { %>
+                    <li><%= book.title %> by <%= book.author %> (<%= book.genre %>, <%= book.year_of_publication %>)</li>
+                <% }) %>
+            </ul>
+        <% } else if (typeof error !== 'undefined') { %>
+            <div class="error"><%= error %></div>
+        <% } %>
+    </div>
+</body>
+</html>

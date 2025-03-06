@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List - Book Recommendations</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Book List</h2>
+
+        <!-- Book List Section -->
+        <% if (books && books.length > 0) { %>
+            <h3>Current Books in the System</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Title</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Author</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Genre</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Rating</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% books.forEach(book => { %>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;"><%= book.title %></td>
+                            <td style="border: 1px solid #ddd; padding: 8px;"><%= book.author %></td>
+                            <td style="border: 1px solid #ddd; padding: 8px;"><%= book.genre %></td>
+                            <td style="border: 1px solid #ddd; padding: 8px;"><%= book.rating %></td>
+                            <td style="border: 1px solid #ddd; padding: 8px;"><%= book.year_of_publication || 'N/A' %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>No books available. Import some below!</p>
+        <% } %>
+
+        <!-- CSV Import Form -->
+        <h3>Bulk Import Books</h3>
+        <form action="/import-csv" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="csvFile">Upload a CSV File:</label>
+                <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+            </div>
+            <button type="submit">Import CSV</button>
+        </form>
+
+        <!-- Navigation -->
+        <div class="switch">
+            <a href="/">Back to Home</a> | 
+            <a href="/search">Search Books</a>
+        </div>
+    </div>
+</body>
+</html>
