@@ -34,26 +34,30 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
-// Recommendations page route
 app.get('/recommendations', (req, res) => {
-    db.query('SELECT * FROM books LIMIT 5', (err, results) => {
-        if (err) throw err;
+    res.render('recommendations', { books: [] }); // Render without fetching books
+});
+
+app.post('/recommend', (req, res) => {
+    const genre = req.body.genre; // Corrected field
+    db.query('SELECT title, author FROM books WHERE genre LIKE ?', 
+    [`%${genre}%`], (err, results) => {
+        if (err) {
+            console.error('Database query error:', err);
+            return res.status(500).send('Database error');
+        }
+        console.log('Query Results:', results); // Debugging output
         res.render('recommendations', { books: results });
     });
 });
 
-// Recommend route (by genre)
-app.post('/recommend', (req, res) => {
-    const genre = req.body.genre;
-    db.query('SELECT * FROM books WHERE genre = ?', [genre], (err, results) => {
-        if (err) throw err;
-        res.render('recommendations', { books: results });
-    });
-});
+
+
+
 
 // Book list route
 app.get('/books', (req, res) => {
-    db.query('SELECT title, author, genre, rating, year_of_publication FROM books', (err, results) => {
+    db.query('SELECT title, author, publisher, year_of_publication FROM books', (err, results) => {
         if (err) throw err;
         res.render('books', { books: results });
     });
@@ -66,20 +70,28 @@ app.post('/import-csv', upload.single('csvFile'), (req, res) => {
         .pipe(csv())
         .on('data', (data) => results.push(data))
         .on('end', () => {
-            const query = 'INSERT INTO books (title, author, genre, description, rating, year_of_publication) VALUES ?';
+            const query = 'INSERT INTO books (isbn, title, author, year_of_publication, publisher, image_url_s, image_url_m, image_url_l) VALUES ?';
             const values = results.map(row => [
-                row.title,
-                row.author,
-                row.genre,
-                row.description || '',
-                parseFloat(row.rating) || 0,
-                parseInt(row.year_of_publication) || null
+                row.isbn || '',
+                row.title || '',
+                row.author || '',
+                parseInt(row.year_of_publication) || null,
+                row.publisher || '',
+                row.image_url_s || '',
+                row.image_url_m || '',
+                row.image_url_l || ''
             ]);
 
             db.query(query, [values], (err) => {
                 if (err) throw err;
                 fs.unlinkSync(req.file.path);
-                res.redirect('/books');
+
+                // Count rows after insertion
+                db.query('SELECT COUNT(*) AS count FROM books', (err, result) => {
+                    if (err) throw err;
+                    console.log('Total rows in books table:', result[0].count);
+                    res.redirect('/books');
+                });
             });
         });
 });
@@ -88,8 +100,6 @@ app.post('/import-csv', upload.single('csvFile'), (req, res) => {
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     if (username && password) {
-        // Add your actual authentication logic here
-        // For now, keeping the simple check
         res.json({ success: true });
     } else {
         res.json({ success: false, error: 'Invalid credentials' });
@@ -99,12 +109,10 @@ app.post('/login', (req, res) => {
 // Register route (assuming you have a users table)
 app.post('/register', (req, res) => {
     const { username, age, password } = req.body;
-    // Basic validation
     if (!username || !age || !password) {
         return res.json({ success: false, error: 'All fields are required' });
     }
-    
-    // Insert user into database (you'll need a users table)
+
     const query = 'INSERT INTO users (username, age, password) VALUES (?, ?, ?)';
     db.query(query, [username, age, password], (err) => {
         if (err) {
@@ -115,7 +123,7 @@ app.post('/register', (req, res) => {
     });
 });
 
-// Health check route (for script.js checkServerStatus)
+// Health check route
 app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });

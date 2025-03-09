@@ -21,12 +21,13 @@
             <h3>Recommended Books</h3>
             <ul>
                 <% books.forEach(book => { %>
-                    <li><%= book.title %> by <%= book.author %> (<%= book.genre %>)</li>
+                    <li><%= book.title %> by <%= book.author %></li>
                 <% }) %>
-            </ul>
+            </ul>              
         <% } else { %>
             <p>No books found. Try a different genre!</p>
         <% } %>
+        
         
         <div><a href="/">Back to Login</a></div>
     </div>
